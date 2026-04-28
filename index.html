@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>MDP Value Iteration · Grid World 动画</title>
+
+  <!-- KaTeX：用于渲染 Bellman 公式（CDN 引入，无需安装） -->
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer
+          src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Value Iteration on a 4×3 Grid World</h1>
+    <div class="trajectory-selector">
+      <span class="label">Trajectory：</span>
+      <button class="traj-btn active" data-traj="1">1</button>
+      <button class="traj-btn" data-traj="2">2</button>
+      <button class="traj-btn" data-traj="3">3</button>
+      <button class="traj-btn" data-traj="4">4</button>
+      <button class="traj-btn" data-traj="5">5</button>
+      <button class="traj-btn" data-traj="6">6</button>
+    </div>
+  </header>
+
+  <!-- 公式横条：始终常显 -->
+  <section class="formula-banner">
+    <div id="formula-template-banner" class="katex-container"></div>
+    <div class="formula-translation">
+      这一格新的 V 值 = 本格立得奖励 + 折扣 0.8 × （在<b>上下左右 4 个动作</b>里挑最优的那个动作 <code>a*</code>；
+      在动作 <code>a*</code> 下，有「按期望走」和「不按期望向两边偏」共 <b>3 种可能走法</b>，
+      把每种走法到达的下一格的 <code>V_old</code> 按概率加权平均）
+    </div>
+
+    <details class="formula-derivation">
+      <summary>公式推导（点击展开）</summary>
+      <div class="derivation-body">
+        <p><b>1. 起点（作业中已给出的 Bellman 最优方程，期望按转移概率展开形式）</b>：</p>
+        <div class="katex-line" data-tex="V^*(s) = \max_a \sum_{s'} T(s,a,s')\,\big[R(s,a,s') + \gamma\, V^*(s')\big]"></div>
+        <p>含义：先在 4 个动作里挑一个最好的；在这个动作下，对所有可能的下一格 <code>s'</code> 求加权和，
+          权重 = 转移概率 <code>T</code>，每项里既有「转移到 s' 时领的奖励」也有「s' 自己的未来价值」。</p>
+
+        <p><b>2. 本题的特殊化：把 R 从求和里提出来</b></p>
+        <p>本题 reward 的定义是「<b>站到哪格就领哪格的奖励</b>」（普通 −2 / 红 −1 / 绿 +1）：
+          <span class="aside">注意细节：作业用的是「进入这格后立得 R(s)」的写法，相当于把 R 挂在<b>当前 state s</b> 上，与动作 a、下一格 s' 都<b>无关</b>。</span>
+        </p>
+        <p>所以 <code>R(s,a,s')</code> 里的 a、s' 其实都用不上，可以简记为 <code>R(s)</code>。
+          它跟求和指标 s' 无关，按求和的线性性质可以提到外面：</p>
+        <div class="katex-line" data-tex="V^*(s) = R(s) + \max_a \sum_{s'} T(s,a,s')\cdot \gamma\, V^*(s')"></div>
+        <p>再把常数 γ 也从求和里提出来：</p>
+        <div class="katex-line" data-tex="V^*(s) = R(s) + \gamma \cdot \max_a \sum_{s'} T(s,a,s')\cdot V^*(s')"></div>
+        <p class="aside">⚠️ 这一步成立的关键是「<code>R</code> 与 <code>a, s'</code> 无关」。
+          如果 reward 是「这一步动作的代价」或「转移路径的奖励」，R 就不能这样提出来。</p>
+
+        <p><b>3. 用作「赋值」（迭代式）：把 V* 拆成 V_old 和 V_new</b></p>
+        <p>方程左右两边的 V* 是同一个函数，求解时用「不动点迭代」：右边代入旧值 V_old，
+          算出来的结果赋值给左边的 V_new，再把 V_new 当作下一轮的 V_old。这就是 Value Iteration 的核心：</p>
+        <div class="katex-line" data-tex="V_{\text{new}}(s) = R(s) + \gamma \cdot \max_a \sum_{s'} T(s,a,s')\cdot V_{\text{old}}(s')"></div>
+
+        <p><b>4. 引入 Q(s, a)：把「某个动作下的期望未来价值」单独命名</b></p>
+        <p>右边那个 <code>Σ T(s,a,s')·V_old(s')</code> 是「在动作 a 下，下一步价值的期望」，
+          为了书写简洁，给它一个名字 <code>Q(s, a)</code>：</p>
+        <div class="katex-line" data-tex="Q(s, a) \;\triangleq\; \sum_{s'} T(s,a,s')\cdot V_{\text{old}}(s')"></div>
+        <p>于是公式简化成「先对 4 个动作各算一个 Q，再选最大那个」：</p>
+        <div class="katex-line" data-tex="V_{\text{new}}(s) = R(s) + \gamma \cdot \max_a Q(s, a)"></div>
+        <p class="aside">下方信息栏里的 <code>Q(UP) / Q(DOWN) / Q(LEFT) / Q(RIGHT)</code> 就是这 4 个 Q 值；
+          其中最大的那个对应的动作就是 <code>a*</code>（公式里的 <code>max_a</code>）。</p>
+
+        <p><b>直觉版</b>：「这格的最优价值」= 「站这格立刻拿的奖励」+ 折扣 × 「在最聪明的动作下，未来的期望价值」。
+          标准 Value Iteration 把这个等式当赋值<b>反复用直到 V 不再变</b>；
+          <b>本题特殊</b>：不迭代到收敛，只<b>沿 trajectory 顺序</b>对每个 state 做<b>一次 backup</b>。</p>
+      </div>
+    </details>
+  </section>
+
+  <main>
+    <!-- 左：网格 + 累积 V 表 -->
+    <section class="grid-pane">
+      <div id="grid"></div>
+      <p class="hint">坐标 <code>[row, col]</code>，左下 = <code>[0,0]</code>。
+         单元里的数字是当前 V 值，<code>—</code> 表示尚未计算。</p>
+
+      <div class="v-matrix-block">
+        <div class="v-matrix-title">
+          累积 V 值表（每完成一个 step 自动写入）
+        </div>
+        <div id="v-matrix"></div>
+        <div class="precision-note">
+          ⓘ 与答案 PDF 偶有 ±0.01 差异（如 T6 s₃）：本页全程用浮点精确值，
+          PDF 答案则是「每步先把 V 四舍五入到 2 位小数再代入下一步计算」，
+          中间舍入误差会一路累积。两边都对，只是教材风格 vs 精确风格的区别。
+        </div>
+      </div>
+    </section>
+
+    <!-- 右：信息面板 -->
+    <section class="info-pane">
+      <div class="step-meta">
+        <div id="step-title">Trajectory 1 — step 0 / 5</div>
+        <div id="sub-step-title" class="sub">Sub-step 0 / 5</div>
+        <div id="sub-step-explain" class="sub-explain"></div>
+      </div>
+
+      <div class="block">
+        <div class="block-title">当前状态</div>
+        <div id="state-info"></div>
+      </div>
+
+      <div class="block">
+        <div class="block-title">4 个动作的 Q 值</div>
+        <div class="block-subtitle">
+          目的：在 4 个动作里找出 Q 值最大的那个动作 <code>a*</code> —— 这就是公式里的 <code>max_a</code>。
+          <br>⚠️ <code>a*</code> 与 trajectory 表里写的 <code>a<sub>t</sub></code> 是两回事：
+          <code>a<sub>t</sub></code> 只决定机器人下一步走到哪格，<b>不进 V 公式</b>。
+        </div>
+        <div id="q-table"></div>
+      </div>
+
+      <div class="block">
+        <div class="block-title">代入与化简</div>
+        <div id="formula-substitute" class="katex-container"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="controls">
+    <button id="btn-reset" title="回到 Trajectory 起点">⟲ Reset</button>
+    <button id="btn-prev"  title="上一子步">◀ Prev</button>
+    <button id="btn-next"  title="下一子步">Next ▶</button>
+    <button id="btn-play"  title="自动推进">▶ Play</button>
+    <label class="speed">
+      Speed:
+      <input id="speed" type="range" min="0.3" max="3" step="0.1" value="1">
+      <span id="speed-label">1.0×</span>
+    </label>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

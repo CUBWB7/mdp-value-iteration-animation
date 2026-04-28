@@ -1,0 +1,379 @@
+/* ===== 全局 ===== */
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0;
+  font-family: -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: #fafaf7;
+  color: #222;
+}
+body { display: flex; flex-direction: column; min-height: 100vh; }
+
+header {
+  padding: 14px 24px 8px;
+  border-bottom: 1px solid #e0e0d8;
+  background: #fff;
+}
+header h1 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 600;
+}
+.trajectory-selector { display: flex; align-items: center; gap: 6px; }
+.trajectory-selector .label { font-size: 13px; color: #666; }
+.traj-btn {
+  width: 30px; height: 30px;
+  border: 1px solid #c8c8c0;
+  background: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+.traj-btn:not(:disabled):hover { background: #eee; }
+.traj-btn.active { background: #2a6df4; color: #fff; border-color: #2a6df4; }
+.traj-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ===== 公式横条（常显） ===== */
+.formula-banner {
+  background: #f4f7ff;
+  border-bottom: 1px solid #d6e0f5;
+  padding: 12px 24px;
+}
+.formula-banner .katex-container {
+  text-align: center;
+  padding: 2px 0;
+}
+.formula-derivation {
+  margin-top: 8px;
+  font-size: 13px;
+  border-top: 1px dashed #c8d4ec;
+  padding-top: 6px;
+}
+.formula-derivation summary {
+  cursor: pointer;
+  color: #2a6df4;
+  font-weight: 500;
+  text-align: center;
+  list-style: none;
+  user-select: none;
+  padding: 4px 0;
+}
+.formula-derivation summary::before {
+  content: "▶ ";
+  font-size: 10px;
+  margin-right: 4px;
+}
+.formula-derivation[open] summary::before { content: "▼ "; }
+.formula-derivation summary:hover { text-decoration: underline; }
+.derivation-body {
+  max-width: 760px;
+  margin: 8px auto 0;
+  padding: 12px 18px;
+  background: #fff;
+  border: 1px solid #d6e0f5;
+  border-radius: 6px;
+  color: #333;
+  line-height: 1.7;
+}
+.derivation-body p { margin: 4px 0 8px; }
+.derivation-body code {
+  background: #eef;
+  padding: 0 4px;
+  border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 12px;
+}
+.derivation-body .aside {
+  display: block;
+  margin: 4px 0;
+  padding: 4px 10px;
+  background: #fafaf0;
+  border-left: 3px solid #c8c8a0;
+  color: #666;
+  font-size: 12px;
+}
+.katex-line {
+  text-align: center;
+  padding: 4px 0;
+  margin: 4px 0;
+  overflow-x: auto;
+}
+
+.formula-translation {
+  font-size: 13px;
+  color: #4a5a7a;
+  text-align: center;
+  margin-top: 6px;
+  line-height: 1.6;
+}
+
+/* ===== 子步解释 + 块副标题 ===== */
+.sub-explain {
+  font-size: 13px;
+  color: #555;
+  margin-top: 6px;
+  line-height: 1.6;
+  padding: 6px 10px;
+  background: #f6f6f0;
+  border-left: 3px solid #c8c8c0;
+  border-radius: 3px;
+}
+.block-subtitle {
+  font-size: 12px;
+  color: #777;
+  line-height: 1.6;
+  margin-bottom: 8px;
+  padding: 6px 8px;
+  background: #fafaf0;
+  border-radius: 3px;
+}
+.block-subtitle code {
+  background: #eee;
+  padding: 0 4px;
+  border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+}
+
+/* ===== 累积 V 表（在 grid-pane 内，位于 grid 下方） ===== */
+.v-matrix-block {
+  margin-top: 16px;
+  width: 100%;
+  max-width: 360px;
+}
+.v-matrix-title {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.v-matrix-table {
+  border-collapse: collapse;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.v-matrix-table th,
+.v-matrix-table td {
+  border: 1px solid #d0d0c8;
+  padding: 4px 8px;
+  text-align: center;
+  min-width: 38px;
+}
+.v-matrix-table thead th {
+  background: #f0f0ea;
+  font-weight: 600;
+  color: #555;
+}
+.v-matrix-table tbody th {
+  background: #fafaf0;
+  font-weight: 600;
+  color: #666;
+}
+.v-matrix-table td.empty { color: #c8c8c0; }
+.v-matrix-table .col-current { background: #eef4ff; }
+.v-matrix-table thead .col-current { background: #d6e4ff; color: #2a6df4; }
+.v-matrix-table .row-current td,
+.v-matrix-table .row-current th { background: #fff8d6; }
+.v-matrix-table .row-current td.col-current { background: #ffe9a8; }
+.precision-note {
+  margin-top: 8px;
+  padding: 6px 10px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: #777;
+  background: #f6f6f0;
+  border-left: 3px solid #c8c8c0;
+  border-radius: 3px;
+  max-width: 360px;
+}
+
+/* ===== 主区域：左网格 + 右信息面板 ===== */
+main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(360px, 1fr) minmax(420px, 1.3fr);
+  gap: 24px;
+  padding: 24px;
+}
+
+.grid-pane { display: flex; flex-direction: column; align-items: center; }
+.grid-pane .hint { font-size: 12px; color: #888; margin-top: 12px; max-width: 340px; }
+.grid-pane .hint code {
+  background: #eee; padding: 1px 4px; border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+}
+
+/* ===== 棋盘 ===== */
+#grid {
+  display: grid;
+  grid-template-columns: repeat(4, 80px);
+  grid-template-rows: repeat(3, 80px);
+  gap: 2px;
+  background: #999;
+  padding: 2px;
+  border-radius: 4px;
+}
+.cell {
+  background: #fff;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  transition: background 0.25s, box-shadow 0.25s;
+}
+.cell.green  { background: #52c569; color: #fff; }
+.cell.red    { background: #e64a4a; color: #fff; }
+.cell.wall   { background: #2a2a2a; color: #2a2a2a; }
+
+/* 高亮：a* 的 3 个 stochastic 邻居 */
+.cell.hl-08 { box-shadow: inset 0 0 0 4px #2a6df4; background: #d6e4ff; }
+.cell.hl-01 { box-shadow: inset 0 0 0 3px #88adff; background: #ecf2ff; }
+.cell.hl-08.green, .cell.hl-01.green { background: #52c569; }
+.cell.hl-08.red,   .cell.hl-01.red   { background: #e64a4a; }
+
+/* 概率角标 */
+.prob-badge {
+  position: absolute;
+  top: 2px; right: 4px;
+  font-size: 11px;
+  background: #fff;
+  border-radius: 3px;
+  padding: 0 4px;
+  color: #2a6df4;
+  font-weight: 600;
+  box-shadow: 0 0 0 1px #2a6df4;
+}
+.prob-badge.p01 { color: #5d80c7; box-shadow: 0 0 0 1px #88adff; }
+
+/* 机器人 */
+.robot {
+  position: absolute;
+  font-size: 28px;
+  pointer-events: none;
+  transition: transform 0.3s ease;
+  z-index: 5;
+}
+
+/* trajectory a_t 淡灰箭头（在机器人右侧） */
+.action-hint {
+  position: absolute;
+  top: 4px; left: 4px;
+  font-size: 11px;
+  color: #aaa;
+  font-style: italic;
+}
+
+/* 左下角坐标小字 */
+.cell .coord-label {
+  position: absolute;
+  bottom: 3px;
+  left: 4px;
+  font-size: 10px;
+  color: #b0b0a8;
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  pointer-events: none;
+}
+.cell.green .coord-label,
+.cell.red .coord-label { color: rgba(255, 255, 255, 0.65); }
+
+/* V 值标签 */
+.cell .v-value {
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+.cell .v-empty { color: #ccc; }
+
+/* ===== 右侧信息面板 ===== */
+.info-pane { display: flex; flex-direction: column; gap: 14px; }
+.step-meta { padding: 6px 0; border-bottom: 1px solid #e0e0d8; }
+#step-title { font-size: 16px; font-weight: 600; }
+#sub-step-title { font-size: 13px; color: #888; margin-top: 2px; }
+
+.block {
+  border: 1px solid #e0e0d8;
+  border-radius: 6px;
+  padding: 10px 14px;
+  background: #fff;
+}
+.block-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+.block.dim { opacity: 0.35; }
+
+#state-info { font-size: 13px; line-height: 1.7; }
+#state-info .traj-action { color: #999; font-style: italic; }
+#state-info .opt-action { margin-top: 6px; color: #b8860b; font-weight: 600; }
+.trans-table {
+  margin-top: 4px;
+  border-collapse: collapse;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.trans-table th, .trans-table td {
+  border: 1px solid #e0d8b0;
+  padding: 3px 10px;
+  text-align: center;
+}
+.trans-table thead th { background: #fff8d6; color: #555; font-weight: 600; }
+.trans-table tbody td { background: #fffbe8; }
+.trans-table code { background: transparent; padding: 0; font-size: 12px; }
+
+/* Q-table 4 行 */
+#q-table { display: flex; flex-direction: column; gap: 4px; }
+.q-row {
+  display: flex; align-items: center;
+  font-size: 13px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.q-row .q-action {
+  display: inline-block; min-width: 60px;
+  font-weight: 600;
+}
+.q-row.is-max {
+  background: #fff8d6;
+  border: 1px solid #f0c419;
+}
+.q-row .max-mark {
+  margin-left: auto;
+  color: #b8860b; font-weight: 600;
+  font-size: 12px;
+}
+
+/* KaTeX 容器留白 */
+.katex-container { padding: 6px 0; min-height: 28px; }
+.katex-container .placeholder {
+  color: #bbb; font-style: italic; font-size: 12px;
+}
+
+/* ===== 底部控件 ===== */
+.controls {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 24px;
+  border-top: 1px solid #e0e0d8;
+  background: #fff;
+}
+.controls button {
+  padding: 6px 14px;
+  font-size: 13px;
+  border: 1px solid #c8c8c0;
+  background: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.controls button:hover:not(:disabled) { background: #eee; }
+.controls button:disabled { opacity: 0.4; cursor: not-allowed; }
+.controls .speed {
+  margin-left: auto;
+  font-size: 13px; color: #666;
+  display: flex; align-items: center; gap: 8px;
+}
+.controls .speed input { width: 120px; }
