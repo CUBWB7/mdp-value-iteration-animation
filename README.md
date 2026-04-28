@@ -10,8 +10,6 @@
 
 ![screenshot](docs/screenshot.png)
 
-> 📌 把截图放到 `docs/screenshot.png` 后即可显示（如果不需要可删掉这段）。
-
 ## 它做什么
 
 - **6 条预设 trajectory**，每条沿着轨迹依次对每个 state 做一次 Bellman 最优更新
