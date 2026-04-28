@@ -4,7 +4,7 @@
 
 ## 在线体验
 
-👉 https://<你的用户名>.github.io/<仓库名>/
+👉 https://cubwb7.github.io/mdp-value-iteration-animation/
 
 ## 截图
 
@@ -40,8 +40,8 @@ V_new(s) = R(s) + γ · max_a Σ_{s'} T(s, a, s') · V_old(s')
 ## 本地运行
 
 ```bash
-git clone https://github.com/<你的用户名>/<仓库名>.git
-cd <仓库名>
+git clone https://github.com/CUBWB7/mdp-value-iteration-animation.git
+cd mdp-value-iteration-animation
 open index.html      # macOS
 # 或者直接双击 index.html
 ```
