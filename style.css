@@ -408,8 +408,18 @@ main {
   }
   .precision-note { max-width: 100%; }
 
-  .controls { flex-wrap: wrap; padding: 10px 14px; }
+  /* 控件悬浮在视口底部，保证看图时仍能点 Next */
+  .controls {
+    flex-wrap: wrap;
+    padding: 8px 12px;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 20;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.12);
+  }
   .controls .speed { margin-left: 0; width: 100%; }
+  /* 给 body 留出底部空间，避免悬浮栏遮住内容 */
+  body { padding-bottom: 96px; }
 }
 
 @media (max-width: 480px) {
